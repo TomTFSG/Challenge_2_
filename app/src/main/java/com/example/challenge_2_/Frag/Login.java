@@ -163,8 +163,6 @@ public class Login extends Fragment implements View.OnClickListener{
                 }
             }
         });
-
-
     }
     private void login(String username,String password){
         final boolean[] exists ={false};
@@ -224,7 +222,6 @@ public class Login extends Fragment implements View.OnClickListener{
                                         }
                                     });
                         }
-
                         else{
                             //O utilizador enganou-se
                             Context context = getActivity().getApplicationContext();
