@@ -206,13 +206,14 @@ public class Login extends Fragment implements View.OnClickListener{
                                                     String key=document.getString("password");
                                                     if(key.equals(finalResultP)){
                                                         //LOGIN PARA A PAGINA A SEGUIR
-                                                        Log.w(TAG, "I'm IN BABY WOOOOOOOO", task.getException());
-                                                        List anotherFragment = new List(); // Replace 'AnotherFragment' with the desired fragment class.
+                                                        Log.w(TAG, "I'm IN BABY WOOOOOOOO", task.getException());//log p testar
+
+                                                        //mudar para fragmento
+                                                        List anotherFragment = new List(username);
                                                         FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
                                                         transaction.replace(R.id.framelayout, anotherFragment,null);
-                                                        transaction.addToBackStack(null); // This allows you to navigate back to the previous fragment.
+                                                        transaction.addToBackStack(null);
                                                         transaction.commit();
-
                                                     }
                                                     else{
                                                         Context context = getActivity().getApplicationContext();
