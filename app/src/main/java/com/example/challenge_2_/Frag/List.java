@@ -38,6 +38,11 @@ public class List extends Fragment {
 
     }
     @Override
+    public void onViewCreated(View view,Bundle savedInstanceState){
+        Button logout=view.findViewById(R.id.logout);
+        //logout.setOnClickListener(this);
+    }
+    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         db=FirebaseFirestore.getInstance();
