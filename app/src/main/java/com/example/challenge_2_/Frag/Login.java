@@ -7,6 +7,7 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -206,6 +207,11 @@ public class Login extends Fragment implements View.OnClickListener{
                                                     if(key.equals(finalResultP)){
                                                         //LOGIN PARA A PAGINA A SEGUIR
                                                         Log.w(TAG, "I'm IN BABY WOOOOOOOO", task.getException());
+                                                        List anotherFragment = new List(); // Replace 'AnotherFragment' with the desired fragment class.
+                                                        FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
+                                                        transaction.replace(R.id.framelayout, anotherFragment,null);
+                                                        transaction.addToBackStack(null); // This allows you to navigate back to the previous fragment.
+                                                        transaction.commit();
 
                                                     }
                                                     else{
