@@ -8,6 +8,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -40,7 +41,16 @@ public class List extends Fragment {
     @Override
     public void onViewCreated(View view,Bundle savedInstanceState){
         Button logout=view.findViewById(R.id.logout);
-        //logout.setOnClickListener(this);
+        logout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Login anotherFragment = new Login();
+                FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
+                transaction.replace(R.id.framelayout, anotherFragment,null);
+                transaction.addToBackStack(null);
+                transaction.commit();
+            }
+        });
     }
     @Override
     public void onCreate(Bundle savedInstanceState) {
