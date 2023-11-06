@@ -194,7 +194,6 @@ public class Login extends Fragment implements View.OnClickListener{
 
                         // Isto é um listener dentro de um listener, n é muito bonito mas deve funcionar
                         if(exists[0]==true){
-                            String finalResultP = resultP;
                             db.collection("users")
                                     .whereEqualTo("username", resultU)
                                     .get()
@@ -204,7 +203,7 @@ public class Login extends Fragment implements View.OnClickListener{
                                             if (task.isSuccessful()) {
                                                 for (QueryDocumentSnapshot document : task.getResult()) {
                                                     String key=document.getString("password");
-                                                    if(key.equals(finalResultP)){
+                                                    if(key.equals(password)){
                                                         //LOGIN PARA A PAGINA A SEGUIR
                                                         Log.w(TAG, "I'm IN BABY WOOOOOOOO", task.getException());//log p testar
 
