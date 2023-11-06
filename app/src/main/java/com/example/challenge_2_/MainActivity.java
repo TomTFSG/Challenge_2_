@@ -1,5 +1,7 @@
 package com.example.challenge_2_;
 
+import static android.content.ContentValues.TAG;
+
 import  androidx.appcompat.app.AppCompatActivity;
 
 import android.content.ContentValues;
@@ -27,4 +29,5 @@ public class MainActivity extends AppCompatActivity {
                 .add(R.id.framelayout, Login.class, null)
                 .commit();
     }
+
 }

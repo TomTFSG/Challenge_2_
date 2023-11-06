@@ -29,7 +29,7 @@ public class List extends Fragment {
     String user;
     FirebaseFirestore db;
     public List(String username) {
-        user=username;
+        user = username;
     }
 
     @Override
@@ -41,76 +41,67 @@ public class List extends Fragment {
     }
     @Override
     public void onViewCreated(View view,Bundle savedInstanceState){
-        Button logout=view.findViewById(R.id.logout);
-        FloatingActionButton newNote=view.findViewById(R.id.add);
-        logout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Login anotherFragment = new Login();
-                FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
-                transaction.replace(R.id.framelayout, anotherFragment,null);
-                transaction.addToBackStack(null);
-                transaction.commit();
-            }
-        });
-        newNote.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                String vazio="";
-                Edit anotherFragment = new Edit(vazio,user,vazio,vazio);
-                FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
-                transaction.replace(R.id.framelayout, anotherFragment,null);
-                transaction.addToBackStack(null);
-                transaction.commit();
-            }
+        Button logout = view.findViewById(R.id.logout);
+        FloatingActionButton newNote = view.findViewById(R.id.add);
+
+        logout.setOnClickListener(view1 -> gotoFrag(new Login()));
+
+        newNote.setOnClickListener(view2 -> {
+            String vazio = "";
+            gotoFrag(new Edit(vazio, user, vazio, vazio));
         });
     }
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        db=FirebaseFirestore.getInstance();
+
+
+        //ir buscar as notas do utilizador em questão
+        db = FirebaseFirestore.getInstance();
         db.collection("notes")
                 .whereEqualTo("users_username", user)
                 .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        View view=getView();
-                        LinearLayout menu= view.findViewById(R.id.menu);
-                        Context context=getContext();
-                        if (task.isSuccessful()) {
-                            for (QueryDocumentSnapshot document : task.getResult()) {
-                                String titulo= document.getString("title"); // DADO ESTE MODELO, NENHUM UTILIZADOR PODE TER DUAS NOTAS COM O MESMO NOME
-                                String nota=document.getString("note");
-                                String id= document.getId().toString();
-                                Button select=new Button(context);
-                                ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(
-                                        ViewGroup.LayoutParams.MATCH_PARENT, // Width
-                                        ViewGroup.LayoutParams.WRAP_CONTENT   // Height (you can adjust this as needed)
-                                );
-                                select.setLayoutParams(layoutParams);
-                                select.setText(titulo);
-                                select.setTextAlignment(view.TEXT_ALIGNMENT_TEXT_START);
+                .addOnCompleteListener(task -> {
+                    View view = getView();
+                    LinearLayout menu = view.findViewById(R.id.menu);
+                    Context context = getContext();
+                    if (task.isSuccessful()) {
+                        for (QueryDocumentSnapshot document : task.getResult()) {
+                            // DADO ESTE MODELO, NENHUM UTILIZADOR PODE TER DUAS NOTAS COM O MESMO NOME
+                            // DADO ESTE MODELO, NENHUM UTILIZADOR PODE TER DUAS NOTAS COM O MESMO NOME
+                            // DADO ESTE MODELO, NENHUM UTILIZADOR PODE TER DUAS NOTAS COM O MESMO NOME
+                            String titulo = document.getString("title");
+                            String nota = document.getString("note");
+                            String id = document.getId().toString();
+                            Button select = new Button(context);
 
-                                select.setOnClickListener(new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View view) {
-                                        Edit anotherFragment = new Edit(titulo,user,nota,id);
-                                        FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
-                                        transaction.replace(R.id.framelayout, anotherFragment,null);
-                                        transaction.addToBackStack(null);
-                                        transaction.commit();
-                                    }
-                                });
-                                menu.addView(select);
-                                menu.invalidate();
+                            ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(
+                                    ViewGroup.LayoutParams.MATCH_PARENT, // Width
+                                    ViewGroup.LayoutParams.WRAP_CONTENT   // Height (you can adjust this as needed)
+                            );
+
+                            select.setLayoutParams(layoutParams);
+                            select.setText(titulo);
+                            select.setTextAlignment(view.TEXT_ALIGNMENT_TEXT_START);
+
+                            select.setOnClickListener(view3 -> gotoFrag(new Edit(titulo, user, nota, id)));
+                            menu.addView(select);
+                            menu.invalidate();
 
 
-                            }
-                        } else {
-                            Log.d(TAG, "Error getting documents: ", task.getException());
                         }
+                    } else {
+                        Log.d(TAG, "Error getting documents: ", task.getException());
                     }
                 });
+    }
+
+
+    //Função criada para facilitar a visialuzação do código (troca de fragments)
+    private void gotoFrag(@NonNull androidx.fragment.app.Fragment Frag){
+        getActivity().getSupportFragmentManager().beginTransaction()
+            .replace(R.id.framelayout, Frag,null)
+            .addToBackStack(null)
+            .commit();
     }
 }

@@ -46,7 +46,6 @@ public class Login extends Fragment implements View.OnClickListener{
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         db = FirebaseFirestore.getInstance();
-
     }
 
     @Override
@@ -66,178 +65,167 @@ public class Login extends Fragment implements View.OnClickListener{
     }
     @Override
     public void onClick(View view) {
-        Context context = getActivity().getApplicationContext();
         String username = user.getText().toString();
         String password = pass.getText().toString();
         int id= view.getId();
-        if(id==R.id.register_button){
-            if (password.isEmpty() || username.isEmpty()) {
-                CharSequence err = "Please fill username and password";
-                int dur = Toast.LENGTH_SHORT;
-                Toast inc = Toast.makeText(context, err, dur);
-                inc.show();
-            } else {
-                //REGISTAR
-                registar(username,password);
-            }
 
+        if (password.isEmpty() || username.isEmpty()) {
+            TOASTY("Please fill username and password");
         }
-        else if(id==R.id.login_button){
-            if (password.isEmpty() || username.isEmpty()) {
-                CharSequence err = "Please fill username and password";
-                int dur = Toast.LENGTH_SHORT;
-                Toast inc = Toast.makeText(context, err, dur);
-                inc.show();
-            } else {
-                //LOGIN
-                login(username,password);
-            }
-
+        else{
+            if(id == R.id.register_button) registar(username, password);
+            else if(id == R.id.login_button) login(username,password);
         }
     }
+
+
+
+
+
+
+
+    // Função que cria um toast (referência a MK)
+    private void TOASTY(CharSequence err){
+        Context context = getActivity().getApplicationContext();
+        int dur = Toast.LENGTH_SHORT;
+        Toast inc = Toast.makeText(context, err, dur);
+        inc.show();
+    }
+
+    // definir variáveis utilizadas para checkar o Login e o Registo
+    private final boolean[] exists ={false};
+    private String resultU = ""; //resultado User (mutável na função CheckarUser)
+    private String resultP = ""; //resultado Password (mutável na função CheckarUser)
+
+
+    // Função Registar é chamada quando se clica no botão de Registo
     private void registar(String username, String password){
 
-        //Cria o objeto "user" que vai adicionar à tabela dos users
-        Map<String,Object> user=new HashMap<>();
-        user.put("username",username);
-        user.put("password",password);
+        //Cria o objeto "novoUser" que vai adicionar à tabela dos users
+        Map<String,Object> novoUser = new HashMap<>();
+        novoUser.put("username", username);
+        novoUser.put("password", password);
 
 
         //Vai buscar todos utilizadores existentes para verificar que o username ainda n esta utilizado
-        final boolean[] exists ={false};
+
         db.collection("users")
                 .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                if (task.isSuccessful()) {
-                    exists[0]=false;
-                    for (QueryDocumentSnapshot document : task.getResult()) {
-                        String result=document.getString("username");//recebe resultado de username que esta selecionado no for
-                        Log.w(TAG, username + " => " + result);
-                        if(username.equals(result)){ // O JAVA COMPARA COM .equals, == N EXISTE PASSEI MEIA HORA ATE DESCOBRI ISTO FFS
-                            Log.w(TAG,"JA EXISTE");
-                            exists[0] =true;//tem de ser um array p ser final e n dar erro ( coisas de java sei la)
-                            break;//se ja sabemos q existe, n temos de procurar mais. Logo, break.
-                        }
-                        Log.w(TAG, username + " => " + result + " "+exists);
-                    }
-                } else {
-                    Log.e(TAG, "Error getting documents: ", task.getException());//Se der erro isto aparece no log
-                }
+                .addOnCompleteListener(task -> {
+                    CheckarUsers(false, task, username);
 
-
-
-
-                // Isto é um listener dentro de um listener, n é muito bonito mas deve funcionar
-                if(exists[0]==true){
-                    //Isto cria um Toast a dizer que o username já está em uso.
-                    Context context = getActivity().getApplicationContext();
-                    CharSequence err = "Username already in use";
-                    int dur = Toast.LENGTH_SHORT;
-                    Toast inc = Toast.makeText(context, err, dur);
-                    inc.show();
-                }
-
-                else{
-                    //O utilizador é adicionado à base de dados
-                    db.collection("users")
-                            .add(user)
-                            .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                                @Override
-                                public void onSuccess(DocumentReference documentReference) {
+                    // Isto é um listener dentro de um listener, n é muito bonito mas deve funcionar
+                    if(exists[0]) TOASTY("Username already in use");
+                    else{
+                        //O utilizador é adicionado à Firestore (vulgo, db)
+                        db.collection("users")
+                                .add(novoUser)
+                                .addOnSuccessListener(documentReference -> {
                                     //Toast rapido a dizer q registou e a pedir login
-                                    Context context = getActivity().getApplicationContext();
-                                    CharSequence err = "Sucessfully registered. Please Login";
-                                    int dur = Toast.LENGTH_SHORT;
-                                    Toast inc = Toast.makeText(context, err, dur);
-                                    inc.show();
-                                    Log.w(TAG, "DocumentSnapshot added with ID: " + documentReference.getId());
-                                }
-                            })
-                            .addOnFailureListener(new OnFailureListener() {
-                                @Override
-                                public void onFailure(@NonNull Exception e) {
-                                    Log.w(TAG, "Error adding document", e);//Caso dê erro aparece isto no log
+                                    TOASTY("Sucessfully registered. Please Login");
+                                    Log.i(TAG, "DocumentSnapshot added with ID: " + documentReference.getId());
+                                })
+                                .addOnFailureListener(e -> {
+                                    Log.e(TAG, "Erro ao adicionar o doc: ", e);//Caso dê erro aparece isto no log
+                                });
+                    }
+                });
+    }
+
+    // Função Login é chamada quando se clica no botão de Login
+    private void login(String username,String password){
+        db.collection("users")
+            .get()
+            .addOnCompleteListener(task -> {
+                CheckarUsers(true, task, username);
+
+                /*
+                    No caso do Login...
+
+                    depois de se checkar os utilizadores (código a cima),
+                    caso o nome de utilizador escrito existir,
+                    vai-se buscar os dados referidos ao utilizador em questão...
+
+                    Se a password estiver incorreta, o utilizador recebe um Toast a informar que o utilizador ou a passe estã incorretos,
+                    senão,este é levado para o Fragmento da lista de notas!
+
+
+                    (se for verificado anteriormente que o user não existe, então, o utilizador recebe a mensagem a informar que o utilizador ou a passe estã incorretos)
+                */
+                if(exists[0]){
+                    db.collection("users")
+                            .whereEqualTo("username", resultU)
+                            .get()
+                            .addOnCompleteListener(task1 -> {
+                                if (task1.isSuccessful()) {
+                                    for (QueryDocumentSnapshot document : task1.getResult()) {
+                                        String key=document.getString("password");
+                                        if(password.equals(key)){
+                                            //LOGIN PARA A PAGINA A SEGUIR
+                                            Log.i(TAG, "I'm IN BABY WOOOOOOOO", task1.getException());//log p testar
+
+                                            //mudar para fragmento
+                                            List anotherFragment = new List(username);
+                                            FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
+                                            transaction.replace(R.id.framelayout, anotherFragment,null);
+                                            transaction.addToBackStack(null);
+                                            transaction.commit();
+                                        }
+                                        else TOASTY("Username/Password incorrect");
+                                    }
+                                } else {
+                                    Log.e(TAG, "Erro a conseguir os docs: ", task1.getException());
                                 }
                             });
                 }
+                else TOASTY("Username/Password incorrect");
             }
-        });
+        );
     }
-    private void login(String username,String password){
-        final boolean[] exists ={false};
-        db.collection("users")
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        exists[0]=false;
-                        String resultU="";
-                        String resultP="";
-                        if (task.isSuccessful()) {
-                            for (QueryDocumentSnapshot document : task.getResult()) {
-                                String result=document.getString("username");//recebe resultado de username que esta selecionado no for
-                                Log.w(TAG, username + " => " + result);
-                                if(username.equals(result)){ // O JAVA COMPARA COM .equals, == N EXISTE PASSEI MEIA HORA ATE DESCOBRI ISTO FFS
-                                    Log.w(TAG,"JA EXISTE");
-                                    exists[0] =true;//tem de ser um array p ser final e n dar erro ( coisas de java sei la)
-                                    resultU=result;
-                                    resultP=document.getString("password");
-                                    break;//se ja sabemos q existe, n temos de procurar mais. Logo, break.
-                                }
-                                Log.w(TAG, username + " => " + result + " "+exists);
-                            }
-                        } else {
-                            Log.e(TAG, "Error getting documents: ", task.getException());//Se der erro isto aparece no log
-                        }
 
-                        // Isto é um listener dentro de um listener, n é muito bonito mas deve funcionar
-                        if(exists[0]==true){
-                            String finalResultP = resultP;
-                            db.collection("users")
-                                    .whereEqualTo("username", resultU)
-                                    .get()
-                                    .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                                        @Override
-                                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                                            if (task.isSuccessful()) {
-                                                for (QueryDocumentSnapshot document : task.getResult()) {
-                                                    String key=document.getString("password");
-                                                    if(key.equals(finalResultP)){
-                                                        //LOGIN PARA A PAGINA A SEGUIR
-                                                        Log.w(TAG, "I'm IN BABY WOOOOOOOO", task.getException());//log p testar
+    // Função utilizada depois no onCompleteListener de ir buscar a coleção "users" dentro da Firestore
+    private void CheckarUsers(
+            boolean login,
+            @NonNull Task<QuerySnapshot> task,
+            String username
+    ){
+        exists[0] = false;
+        resultU = "";
+        resultP = "";
 
-                                                        //mudar para fragmento
-                                                        List anotherFragment = new List(username);
-                                                        FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
-                                                        transaction.replace(R.id.framelayout, anotherFragment,null);
-                                                        transaction.addToBackStack(null);
-                                                        transaction.commit();
-                                                    }
-                                                    else{
-                                                        Context context = getActivity().getApplicationContext();
-                                                        CharSequence err = "Username/Password incorrect";
-                                                        int dur = Toast.LENGTH_SHORT;
-                                                        Toast inc = Toast.makeText(context, err, dur);
-                                                        inc.show();
-                                                    }
-                                                }
-                                            } else {
-                                                Log.d(TAG, "Error getting documents: ", task.getException());
-                                            }
-                                        }
-                                    });
-                        }
-                        else{
-                            //O utilizador enganou-se
-                            Context context = getActivity().getApplicationContext();
-                            CharSequence err = "Username/Password incorrect";
-                            int dur = Toast.LENGTH_SHORT;
-                            Toast inc = Toast.makeText(context, err, dur);
-                            inc.show();
-                        }
+        if (task.isSuccessful()) {
+            /*
+                procura cada QueryDocument dentro do resultado obtido ao se conectar com a Firestore
+                (no onCompleteListener)
+             */
+            for (QueryDocumentSnapshot document : task.getResult()) {
+                String result = document.getString("username"); //recebe resultado de username que esta selecionado no for
+                Log.i(TAG, username + " => " + result);
+
+                //verifica se o username escrito pelo utilizador é igual ao que o utilizador da query em questão
+                if (username.equals(result)) {
+                    Log.w(TAG, "JA EXISTE");
+                    //referir que o utilizador existe (q está na Firestore)
+                    exists[0] = true; //tem de ser um array p ser final e n dar erro ( coisas de java sei la)
+
+                    /*
+                        se estivermos no login,
+                        vai-se definir os resultados de User e de Password escritos pelo utilizador
+                        (que serão utilizados posteriormente ao chamado desta função)
+
+                        se estivermos no registo,
+                        só indica-nos que existe (código anterior a este comentário)
+                        (tal como no login, será utilizado posteriormente)
+                    */
+                    if (login) {
+                        resultU = result;
+                        resultP = document.getString("password");
                     }
-                });
+                    break;//se ja sabemos q existe, n temos de procurar mais. Logo, break.
+                }
+                Log.i(TAG, username + " => " + result + " " + exists);
+            }
+        }
+        else Log.e(TAG, "Erro a conseguir os docs: ", task.getException()); //Se der erro isto aparece no log
     }
 }
