@@ -20,6 +20,7 @@ import android.widget.LinearLayout;
 import com.example.challenge_2_.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -41,10 +42,22 @@ public class List extends Fragment {
     @Override
     public void onViewCreated(View view,Bundle savedInstanceState){
         Button logout=view.findViewById(R.id.logout);
+        FloatingActionButton newNote=view.findViewById(R.id.add);
         logout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Login anotherFragment = new Login();
+                FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
+                transaction.replace(R.id.framelayout, anotherFragment,null);
+                transaction.addToBackStack(null);
+                transaction.commit();
+            }
+        });
+        newNote.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String vazio="";
+                Edit anotherFragment = new Edit(vazio,user,vazio,vazio);
                 FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
                 transaction.replace(R.id.framelayout, anotherFragment,null);
                 transaction.addToBackStack(null);
@@ -68,6 +81,8 @@ public class List extends Fragment {
                         if (task.isSuccessful()) {
                             for (QueryDocumentSnapshot document : task.getResult()) {
                                 String titulo= document.getString("title"); // DADO ESTE MODELO, NENHUM UTILIZADOR PODE TER DUAS NOTAS COM O MESMO NOME
+                                String nota=document.getString("note");
+                                String id= document.getId().toString();
                                 Button select=new Button(context);
                                 ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(
                                         ViewGroup.LayoutParams.MATCH_PARENT, // Width
@@ -80,7 +95,11 @@ public class List extends Fragment {
                                 select.setOnClickListener(new View.OnClickListener() {
                                     @Override
                                     public void onClick(View view) {
-                                        //GO to edit note usando titulo como referencia
+                                        Edit anotherFragment = new Edit(titulo,user,nota,id);
+                                        FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
+                                        transaction.replace(R.id.framelayout, anotherFragment,null);
+                                        transaction.addToBackStack(null);
+                                        transaction.commit();
                                     }
                                 });
                                 menu.addView(select);
