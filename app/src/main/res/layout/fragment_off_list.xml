@@ -5,26 +5,38 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Frag.List">
+    tools:context=".Frag.List"
+    android:background="#080808"
+    android:padding="20dp">
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/add"
+
+
+    <TextView
+        android:id="@+id/notes_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="16dp"
-        android:clickable="true"
-        android:src="@android:drawable/ic_menu_add"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        android:layout_marginTop="24dp"
+        android:padding="20dp"
+        android:text="You are offline, your notes will be upldated when you next login."
+        android:textAlignment="viewStart"
+        android:textColor="#FFFFFF"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.08"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <ScrollView
         android:id="@+id/scrollview"
+        android:padding="40dp"
         android:layout_width="414dp"
-        android:layout_height="609dp"
+        android:layout_height="550dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/logout"
+        app:layout_constraintVertical_bias="1.0">
 
         <LinearLayout
             android:id="@+id/menu"
@@ -33,14 +45,18 @@
             android:orientation="vertical" />
     </ScrollView>
 
-    <TextView
-        android:id="@+id/offInfo"
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/add"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="You are offline, your notes will be upldated when you next login."
-        app:layout_constraintBottom_toTopOf="@+id/scrollview"
+        android:clickable="true"
+        android:src="@drawable/add"
+        app:backgroundTint="#00FFFFFF"
+        app:elevation="0dp"
+        app:fabCustomSize="100dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:maxImageSize="100dp"
+        app:rippleColor="#00FFFFFF" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -4,38 +4,57 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Frag.Edit">
+    tools:context=".Frag.Edit"
+    android:background="#CEEFF1"
+    android:padding="20dp">
 
     <Button
         android:id="@+id/back"
+        style="@android:style/Widget.Material.Light.Button.Borderless.Small"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:text="Back"
+        android:drawableLeft="@drawable/back"
+        android:shadowColor="#00FFFFFF"
+        android:text=""
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/apagar"
+        style="@android:style/Widget.Material.Light.Button.Borderless.Small"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+
+        android:drawableEnd="@drawable/lixo"
+        android:shadowColor="#00FFFFFF"
+        android:text=""
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <EditText
         android:id="@+id/title_box"
-        android:layout_width="284dp"
-        android:layout_height="43dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="92dp"
         android:ems="10"
-        android:inputType="text"
         android:hint="Title"
-        app:layout_constraintBaseline_toBaselineOf="@+id/back"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/back" />
+        android:inputType="text"
+        android:padding="40dp"
+        android:textColor="#000000"
+        app:layout_constraintBottom_toTopOf="@+id/notebox"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:layout_editor_absoluteX="0dp" />
 
     <EditText
         android:id="@+id/notebox"
         android:layout_width="match_parent"
-        android:layout_height="603dp"
-        android:layout_marginTop="68dp"
+        android:layout_height="500dp"
         android:ems="10"
         android:gravity="start|top"
-        android:inputType="textMultiLine"
         android:hint="Note"
+        android:inputType="textMultiLine"
+        android:padding="40dp"
+        android:textColor="#000000"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
