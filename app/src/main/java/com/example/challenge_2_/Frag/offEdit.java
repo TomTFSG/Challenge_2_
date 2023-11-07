@@ -1,14 +1,18 @@
 package com.example.challenge_2_.Frag;
 
+import static android.content.ContentValues.TAG;
+
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +22,8 @@ import android.widget.Toast;
 
 import com.example.challenge_2_.FeedReaderDbHelper;
 import com.example.challenge_2_.R;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 
 public class offEdit extends Fragment {
     String note;
@@ -168,6 +174,37 @@ public class offEdit extends Fragment {
 
                 }
 
+            }
+        });
+        Button delete=view.findViewById(R.id.apagar);
+        back.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                if(flag){
+                    offList anotherFragment = new offList();
+                    FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
+                    transaction.replace(R.id.framelayout, anotherFragment,null);
+                    transaction.addToBackStack(null);
+                    transaction.commit();
+                }
+                else{
+                    String sel = FeedReaderDbHelper.COLUMN_NAME_TITLE + " LIKE ?";
+                    String[] selArgs = { title };
+                    int deletedRows = sql.delete(FeedReaderDbHelper.TABLE_NAME, sel, selArgs);
+
+                    Context context = getActivity().getApplicationContext();
+                    CharSequence err = "The note has been deleted";
+                    int dur = Toast.LENGTH_SHORT;
+                    Toast inc = Toast.makeText(context, err, dur);
+                    inc.show();
+
+                    offList anotherFragment = new offList();
+                    FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
+                    transaction.replace(R.id.framelayout, anotherFragment,null);
+                    transaction.addToBackStack(null);
+                    transaction.commit();
+                }
             }
         });
     }

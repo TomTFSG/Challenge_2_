@@ -15,6 +15,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.example.challenge_2_.R;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -118,6 +119,37 @@ public class Edit extends Fragment {
                 transaction.replace(R.id.framelayout, anotherFragment,null);
                 transaction.addToBackStack(null);
                 transaction.commit();
+            }
+        });
+        Button delete=view.findViewById(R.id.apagar);
+        back.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                db.collection("notes").document(id)
+                        .delete()
+                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+                                Log.d(TAG, "DocumentSnapshot successfully deleted!");
+                                Context context = getActivity().getApplicationContext();
+                                CharSequence err = "The note has been deleted";
+                                int dur = Toast.LENGTH_SHORT;
+                                Toast inc = Toast.makeText(context, err, dur);
+                                inc.show();
+                                List anotherFragment = new List(user);
+                                FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
+                                transaction.replace(R.id.framelayout, anotherFragment,null);
+                                transaction.addToBackStack(null);
+                                transaction.commit();
+                            }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                Log.w(TAG, "Error deleting document", e);
+                            }
+                        });
             }
         });
     }
