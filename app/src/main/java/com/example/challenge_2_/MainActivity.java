@@ -1,30 +1,44 @@
 package com.example.challenge_2_;
 
+import static android.content.ContentValues.TAG;
 import  androidx.appcompat.app.AppCompatActivity;
 
-import android.content.ContentValues;
 import android.content.Context;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.util.Log;
-import android.util.LogPrinter;
-import android.view.View;
-import android.widget.EditText;
-import android.widget.TextView;
-import android.widget.Toast;
+
 import com.example.challenge_2_.Frag.Login;
+import com.example.challenge_2_.Frag.offList;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 
 public class MainActivity extends AppCompatActivity {
+    boolean isConnected=false;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        getSupportFragmentManager().beginTransaction()
-                .add(R.id.framelayout, Login.class, null)
-                .commit();
+        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+
+        if (activeNetworkInfo != null && activeNetworkInfo.isConnected()) {
+            // Device is connected to the internet
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.framelayout, new Login())
+                    .commit();
+        } else {
+            // Device is not connected to the internet
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.framelayout, new offList())
+                    .commit();
+        }
     }
+
 }
