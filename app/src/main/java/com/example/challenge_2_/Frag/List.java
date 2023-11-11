@@ -107,26 +107,29 @@ public class List extends Fragment {
                                 select.setText(titulo);
                                 select.setTextAlignment(view.TEXT_ALIGNMENT_TEXT_START);
 
-                                select.setOnClickListener(view3 -> gotoFrag(new Edit(titulo, user, nota, id)));
                                 select.setOnTouchListener(new View.OnTouchListener(){
                                     private Handler handler = new Handler();
                                     private Runnable runnable;
+                                    private long pressStartTime;
+                                    private static final long MAX_CLICK_DURATION = 200;
                                     @Override
                                     public boolean onTouch(View v, MotionEvent event) {
+
                                         switch (event.getAction()) {
                                             case MotionEvent.ACTION_DOWN:
-                                                // Start the handler after a delay (e.g., 500 milliseconds)
-                                                handler.postDelayed(runnable = () -> {
-                                                    // Handle the long press action
-                                                    onButtonLongPress(select,titulo, user, nota,id);
-                                                }, 500);
+                                                pressStartTime = System.currentTimeMillis();
                                                 break;
-
                                             case MotionEvent.ACTION_UP:
+                                                long pressDuration = System.currentTimeMillis() - pressStartTime;
+                                                if (pressDuration < MAX_CLICK_DURATION) {
+                                                    gotoFrag(new Edit(titulo, user, nota, id));
+                                                } else {
+                                                    onButtonLongPress(select,titulo, user, nota,id);
+                                                }
+                                                break;
                                             case MotionEvent.ACTION_CANCEL:
                                                 // Cancel the handler if the button is released
-                                                handler.removeCallbacks(runnable);
-                                                break;
+                                                pressStartTime = 0;break;
                                         }
                                         return true; // Consume the touch event
                                     }
