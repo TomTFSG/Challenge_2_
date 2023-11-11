@@ -251,42 +251,11 @@ public class List extends Fragment {
 
     }
     private void resetList(){
-        View view=getView();
-        LinearLayout menu = view.findViewById(R.id.menu);
-        db = FirebaseFirestore.getInstance();
-        db.collection("notes")
-                .whereEqualTo("users_username", user)
-                .get()
-                .addOnCompleteListener(task -> {
-                    Context context = getContext();
-                    if (task.isSuccessful()) {
-                        for (QueryDocumentSnapshot document : task.getResult()) {
-                            // DADO ESTE MODELO, NENHUM UTILIZADOR PODE TER DUAS NOTAS COM O MESMO NOME
-                            String titulo = document.getString("title");
-                            String nota = document.getString("note");
-                            String id = document.getId().toString();
-                            Button select = new Button(context);
-
-                            ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(
-                                    ViewGroup.LayoutParams.MATCH_PARENT, // Width
-                                    ViewGroup.LayoutParams.WRAP_CONTENT   // Height (you can adjust this as needed)
-                            );
-
-                            select.setLayoutParams(layoutParams);
-                            select.setText(titulo);
-                            select.setTextAlignment(view.TEXT_ALIGNMENT_TEXT_START);
-
-                            select.setOnClickListener(view3 -> gotoFrag(new Edit(titulo, user, nota, id)));
-                            menu.addView(select);
-                            menu.invalidate();
-
-
-                        }
-
-                    } else {
-                        Log.d(TAG, "Error getting documents: ", task.getException());
-                    }
-                });
+        List anotherFragment = new List(user);
+        FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
+        transaction.replace(R.id.framelayout, anotherFragment,null);
+        transaction.addToBackStack(null);
+        transaction.commit();
     }
 
 }
