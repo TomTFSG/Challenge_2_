@@ -8,6 +8,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.lifecycle.ViewModelProvider;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -18,6 +19,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.example.challenge_2_.R;
+import com.example.challenge_2_.ViewModels.VMFragments;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -35,25 +37,44 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Login extends Fragment implements View.OnClickListener{
-    EditText user;
-    EditText pass;
-    FirebaseFirestore db;
+    private EditText user;
+    private EditText pass;
+    private FirebaseFirestore db;
+    private VMFragments VMFrag;
+
+
+
+    ///////////////////////////////////////////////////////////////////////////
+    //
     public Login() {
-        // Required empty public constructor
     }
 
+
+
+    ///////////////////////////////////////////////////////////////////////////
+    //
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         db = FirebaseFirestore.getInstance();
+        VMFrag = new ViewModelProvider(requireActivity()).get(VMFragments.class);
     }
 
+
+
+    ///////////////////////////////////////////////////////////////////////////
+    //
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_login, container, false);
     }
+
+
+
+    ///////////////////////////////////////////////////////////////////////////
+    //
     @Override
     public void onViewCreated(View view,Bundle savedInstanceState){
         user = view.findViewById(R.id.username);
@@ -63,6 +84,11 @@ public class Login extends Fragment implements View.OnClickListener{
         Button logi=view.findViewById(R.id.login_button);
         logi.setOnClickListener(this);
     }
+
+
+
+    ///////////////////////////////////////////////////////////////////////////
+    //
     @Override
     public void onClick(View view) {
         String username = user.getText().toString();
@@ -81,9 +107,8 @@ public class Login extends Fragment implements View.OnClickListener{
 
 
 
-
-
-
+    ///////////////////////////////////////////////////////////////////////////
+    //
     // Função que cria um toast (referência a MK)
     private void TOASTY(CharSequence err){
         Context context = getActivity().getApplicationContext();
@@ -92,12 +117,20 @@ public class Login extends Fragment implements View.OnClickListener{
         inc.show();
     }
 
+
+
+    ///////////////////////////////////////////////////////////////////////////
+    //
     // definir variáveis utilizadas para checkar o Login e o Registo
     private final boolean[] exists ={false};
     private String resultU = ""; //resultado User (mutável na função CheckarUser)
     private String resultP = ""; //resultado Password (mutável na função CheckarUser)
 
 
+
+
+    ///////////////////////////////////////////////////////////////////////////
+    //
     // Função Registar é chamada quando se clica no botão de Registo
     private void registar(String username, String password){
 
@@ -110,28 +143,32 @@ public class Login extends Fragment implements View.OnClickListener{
         //Vai buscar todos utilizadores existentes para verificar que o username ainda n esta utilizado
 
         db.collection("users")
-                .get()
-                .addOnCompleteListener(task -> {
-                    CheckarUsers(false, task, username);
+            .get()
+            .addOnCompleteListener(task -> {
+                CheckarUsers(false, task, username);
 
-                    // Isto é um listener dentro de um listener, n é muito bonito mas deve funcionar
-                    if(exists[0]) TOASTY("Username already in use");
-                    else{
-                        //O utilizador é adicionado à Firestore (vulgo, db)
-                        db.collection("users")
-                                .add(novoUser)
-                                .addOnSuccessListener(documentReference -> {
-                                    //Toast rapido a dizer q registou e a pedir login
-                                    TOASTY("Sucessfully registered. Please Login");
-                                    Log.i(TAG, "DocumentSnapshot added with ID: " + documentReference.getId());
-                                })
-                                .addOnFailureListener(e -> {
-                                    Log.e(TAG, "Erro ao adicionar o doc: ", e);//Caso dê erro aparece isto no log
-                                });
-                    }
-                });
+                // Isto é um listener dentro de um listener, n é muito bonito mas deve funcionar
+                if(exists[0]) TOASTY("Username already in use");
+                else{
+                    //O utilizador é adicionado à Firestore (vulgo, db)
+                    db.collection("users")
+                            .add(novoUser)
+                            .addOnSuccessListener(documentReference -> {
+                                //Toast rapido a dizer q registou e a pedir login
+                                TOASTY("Sucessfully registered. Please Login");
+                                Log.i(TAG, "DocumentSnapshot added with ID: " + documentReference.getId());
+                            })
+                            .addOnFailureListener(e -> {
+                                Log.e(TAG, "Erro ao adicionar o doc: ", e);//Caso dê erro aparece isto no log
+                            });
+                }
+            });
     }
 
+
+
+    ///////////////////////////////////////////////////////////////////////////
+    //
     // Função Login é chamada quando se clica no botão de Login
     private void login(String username,String password){
         db.collection("users")
@@ -163,13 +200,7 @@ public class Login extends Fragment implements View.OnClickListener{
                                                     if(password.equals(key)){
                                                         //LOGIN PARA A PAGINA A SEGUIR
                                                         Log.i(TAG, "I'm IN BABY WOOOOOOOO", task1.getException());//log p testar
-
-                                                        //mudar para fragmento
-                                                        List anotherFragment = new List(username);
-                                                        FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
-                                                        transaction.replace(R.id.framelayout, anotherFragment,null);
-                                                        transaction.addToBackStack(null);
-                                                        transaction.commit();
+                                                        VMFrag.gotoFrag(new List(username));
                                                     }
                                                     else TOASTY("Username/Password incorrect");
                                                 }
@@ -183,6 +214,10 @@ public class Login extends Fragment implements View.OnClickListener{
                 );
     }
 
+
+
+    ///////////////////////////////////////////////////////////////////////////
+    //
     // Função utilizada depois no onCompleteListener de ir buscar a coleção "users" dentro da Firestore
     private void CheckarUsers(
             boolean login,

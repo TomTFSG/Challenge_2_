@@ -25,6 +25,7 @@ import android.widget.PopupMenu;
 import android.widget.Toast;
 
 import com.example.challenge_2_.R;
+import com.example.challenge_2_.ViewModels.VMFragments;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -32,8 +33,9 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 public class List extends Fragment {
-    String user;
-    FirebaseFirestore db;
+    private String user;
+    private FirebaseFirestore db;
+    private VMFragments VMFrag;
 
     public List(String username) {
         user = username;
@@ -50,7 +52,7 @@ public class List extends Fragment {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         Button logout = view.findViewById(R.id.logout);
-        FloatingActionButton newNote = view.findViewById(R.id.add);
+        Button newNote = view.findViewById(R.id.add);
 
         logout.setOnClickListener(view1 -> gotoFrag(new Login()));
 
