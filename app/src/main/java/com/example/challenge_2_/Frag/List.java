@@ -230,11 +230,6 @@ public class List extends Fragment {
                                     int dur = Toast.LENGTH_SHORT;
                                     Toast inc = Toast.makeText(context, err, dur);
                                     inc.show();
-                                    List anotherFragment = new List(user);
-                                    FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
-                                    transaction.replace(R.id.framelayout, anotherFragment,null);
-                                    transaction.addToBackStack(null);
-                                    transaction.commit();
                                 }
                             })
                             .addOnFailureListener(new OnFailureListener() {
