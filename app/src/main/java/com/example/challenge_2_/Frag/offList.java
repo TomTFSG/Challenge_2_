@@ -170,9 +170,14 @@ public class offList extends Fragment {
                 SQLiteDatabase sql =dbHelper.getWritableDatabase();
                 // Toast message on menu item clicked
                 if(menuItem.getTitle().equals("Delete note")){
-                    String sel = FeedReaderDbHelper.COLUMN_NAME_TITLE + " LIKE ?";
+                    String sel = FeedReaderDbHelper.COLUMN_NAME_TITLE
+                            + " LIKE ?";
                     String[] selArgs = { titulo };
-                    int deletedRows = sql.delete(FeedReaderDbHelper.TABLE_NAME, sel, selArgs);
+                    Context context = getActivity().getApplicationContext();
+                    int deletedRows = sql.delete(FeedReaderDbHelper.TABLE_NAME, sel, selArgs);CharSequence err = "The note has been deleted";
+                    int dur = Toast.LENGTH_SHORT;
+                    Toast inc = Toast.makeText(context, err, dur);
+                    inc.show();
                     resetList();
                 }
                 else if(menuItem.getTitle().equals("Edit note")){
@@ -185,63 +190,11 @@ public class offList extends Fragment {
         popupMenu.show();
     }
     private void resetList(){
-        View view=getView();
-        LinearLayout menu= view.findViewById(R.id.menu);
-        menu.removeAllViews();
-        Context context=getContext();
-        for(int i=0;i<Titles.size();i++){
-            Button select=new Button(context);
-            ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT, // Width
-                    ViewGroup.LayoutParams.WRAP_CONTENT   // Height (you can adjust this as needed)
-            );
-            select.setLayoutParams(layoutParams);
-            String titulo=Titles.get(i);
-            String nota=Notes.get(i);
-            select.setText(titulo);
-            select.setTextAlignment(view.TEXT_ALIGNMENT_TEXT_START);
-            select.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    offEdit anotherFragment = new offEdit(nota, titulo);
-                    FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
-                    transaction.replace(R.id.framelayout, anotherFragment,null);
-                    transaction.addToBackStack(null);
-                    transaction.commit();
-                }
-            });
-            select.setOnTouchListener(new View.OnTouchListener(){
-                private Handler handler = new Handler();
-                private Runnable runnable;
-                private long pressStartTime;
-                private static final long MAX_CLICK_DURATION = 200;
-                @SuppressLint("ClickableViewAccessibility")
-                @Override
-                public boolean onTouch(View v, MotionEvent event) {
-
-                    switch (event.getAction()) {
-                        case MotionEvent.ACTION_DOWN:
-                            pressStartTime = System.currentTimeMillis();
-                            break;
-                        case MotionEvent.ACTION_UP:
-                            long pressDuration = System.currentTimeMillis() - pressStartTime;
-                            if (pressDuration < MAX_CLICK_DURATION) {
-                                gotoFrag(new offEdit(nota,titulo));
-                            } else {
-                                onButtonLongPress(select,titulo,nota);
-                            }
-                            break;
-                        case MotionEvent.ACTION_CANCEL:
-                            // Cancel the handler if the button is released
-                            pressStartTime = 0;break;
-                    }
-                    return true; // Consume the touch event
-                }
-
-            });
-            menu.addView(select);
-            menu.invalidate();
-        }
+        offList anotherFragment = new offList();
+        FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
+        transaction.replace(R.id.framelayout, anotherFragment,null);
+        transaction.addToBackStack(null);
+        transaction.commit();
     }
 
 }
