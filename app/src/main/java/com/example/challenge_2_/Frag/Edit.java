@@ -29,8 +29,7 @@ import java.util.Map;
 
 
 public class Edit extends Fragment {
-    private String title;
-    private String note;
+    private String title, note;
     private String user;
     private String id;
     private FirebaseFirestore db;
@@ -40,14 +39,15 @@ public class Edit extends Fragment {
 
     public Edit(String title,String user,String note,String id) {
         db=FirebaseFirestore.getInstance();
-        this.title=title;
-        this.user=user;
-        this.note=note;
-        this.id=id;
+        this.title = title;
+        this.user = user;
+        this.note = note;
+        this.id = id;
     }
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_edit, container, false);
     }

@@ -4,6 +4,7 @@ import static android.content.ContentValues.TAG;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.ContextWrapper;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
@@ -11,6 +12,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.lifecycle.ViewModelProvider;
 
 import android.os.Handler;
 import android.util.Log;
@@ -36,38 +38,46 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+
 public class List extends Fragment {
     private String user;
     private FirebaseFirestore db;
     private VMFragments VMFrag;
     private java.util.List<String> Notes;
     private java.util.List<String> Titles;
-    int backedupnotes=0;
-    String user;
-    FirebaseFirestore db;
+    int backedupnotes = 0;
 
     public List(String username) {
         user = username;
     }
 
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
+        db = FirebaseFirestore.getInstance();
+        VMFrag = new ViewModelProvider(requireActivity()).get(VMFragments.class);
+
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_list, container, false);
 
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         Button logout = view.findViewById(R.id.logout);
         Button newNote = view.findViewById(R.id.add);
 
-        logout.setOnClickListener(view1 -> gotoFrag(new Login()));
+        logout.setOnClickListener(view1 -> VMFrag.gotoFrag(new Login()));
 
         newNote.setOnClickListener(view2 -> {
             String vazio = "";
-            gotoFrag(new Edit(vazio, user, vazio, vazio));
+            VMFrag.gotoFrag(new Edit(vazio, user, vazio, vazio));
         });
         if(isAdded() && getView() != null) {
             EditText editText = view.findViewById(R.id.searchbar);
@@ -76,7 +86,7 @@ public class List extends Fragment {
                 // Check if the key event is the Enter key
                 if ((event.getAction() == KeyEvent.ACTION_DOWN) &&
                         (keyCode == KeyEvent.KEYCODE_ENTER)) {
-                    String search=editText.getText().toString();
+                    String search = editText.getText().toString();
                     pesquisa(search);
                     return true; // Consume the event
                 }
@@ -84,18 +94,10 @@ public class List extends Fragment {
             });
 
             //ir buscar as notas do utilizador em questão
-            db = FirebaseFirestore.getInstance();
             db.collection("notes")
-                            .
-
-                    whereEqualTo("users_username", user)
-                            .
-
-                    get()
-                            .
-
-                    addOnCompleteListener(task ->
-
+                    .whereEqualTo("users_username", user)
+                    .get()
+                    .addOnCompleteListener(task ->
                     {
 
                         LinearLayout menu = view.findViewById(R.id.menu);
@@ -134,11 +136,10 @@ public class List extends Fragment {
                                                 break;
                                             case MotionEvent.ACTION_UP:
                                                 long pressDuration = System.currentTimeMillis() - pressStartTime;
-                                                if (pressDuration < MAX_CLICK_DURATION) {
-                                                    gotoFrag(new Edit(titulo, user, nota, id));
-                                                } else {
-                                                    onButtonLongPress(select,titulo, user, nota,id);
-                                                }
+
+                                                if (pressDuration < MAX_CLICK_DURATION) VMFrag.gotoFrag(new Edit(titulo, user, nota, id));
+                                                else onButtonLongPress(select,titulo, user, nota,id);
+
                                                 break;
                                             case MotionEvent.ACTION_CANCEL:
                                                 // Cancel the handler if the button is released
@@ -150,10 +151,7 @@ public class List extends Fragment {
                                 });
                                 menu.addView(select);
                                 menu.invalidate();
-
-
                             }
-
                         } else {
                             Log.d(TAG, "Error getting documents: ", task.getException());
                         }
@@ -168,16 +166,7 @@ public class List extends Fragment {
                     note.put("users_username", user);
                     db.collection("notes")
                             .add(note) // Firestore will generate a unique document ID AKA path to file
-                            .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                                @Override
-                                public void onSuccess(DocumentReference documentReference) {
-                                    Context context = getActivity().getApplicationContext();
-                                    CharSequence err = "Notes created offline have been uploaded";
-                                    int dur = Toast.LENGTH_SHORT;
-                                    Toast inc = Toast.makeText(context, err, dur);
-                                    inc.show();
-                                }
-                            })
+                            .addOnSuccessListener(documentReference -> TOASTY("Notes created offline have been uploaded"))
                             .addOnFailureListener(new OnFailureListener() {
                                 @Override
                                 public void onFailure(@NonNull Exception e) {
@@ -234,21 +223,11 @@ public class List extends Fragment {
         cursor.close();
 }
 
-
-
-    //Função criada para facilitar a visialuzação do código (troca de fragments)
-    private void gotoFrag(@NonNull androidx.fragment.app.Fragment Frag){
-        getActivity().getSupportFragmentManager().beginTransaction()
-                .replace(R.id.framelayout, Frag,null)
-                .addToBackStack(null)
-                .commit();
-    }
     private void pesquisa(String s){
-        String search=s;
-        View view=getView();
+        String search = s;
+        View view = getView();
         LinearLayout menu = view.findViewById(R.id.menu);
         menu.removeAllViews();
-        db = FirebaseFirestore.getInstance();
         db.collection("notes")
                 .whereEqualTo("users_username", user)
                 .whereEqualTo("title",search)
@@ -273,11 +252,9 @@ public class List extends Fragment {
                             select.setText(titulo);
                             select.setTextAlignment(view.TEXT_ALIGNMENT_TEXT_START);
 
-                            select.setOnClickListener(view3 -> gotoFrag(new Edit(titulo, user, nota, id)));
+                            select.setOnClickListener(view3 -> VMFrag.gotoFrag(new Edit(titulo, user, nota, id)));
                             menu.addView(select);
                             menu.invalidate();
-
-
                         }
 
                     } else {
@@ -286,54 +263,53 @@ public class List extends Fragment {
                 });
 
     }
-    private void onButtonLongPress(Button button,String titulo,String user,String nota,String id){
-        View view=getView();
+    private void onButtonLongPress(
+            Button button,
+            String titulo,
+            String user,
+            String nota,
+            String id
+    ){
         PopupMenu popupMenu = new PopupMenu(getContext(), button);
 
         // Inflating popup menu from popup_menu.xml file
         popupMenu.getMenuInflater().inflate(R.menu.popup_menu, popupMenu.getMenu());
-        popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem menuItem) {
-                // Toast message on menu item clicked
-                if(menuItem.getTitle().equals("Delete note")){
-                    db.collection("notes").document(id)
-                            .delete()
-                            .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                @Override
-                                public void onSuccess(Void aVoid) {
-                                    Log.d(TAG, "DocumentSnapshot successfully deleted!");
-                                    Context context = getActivity().getApplicationContext();
-                                    CharSequence err = "The note has been deleted";
-                                    int dur = Toast.LENGTH_SHORT;
-                                    Toast inc = Toast.makeText(context, err, dur);
-                                    inc.show();
-                                }
-                            })
-                            .addOnFailureListener(new OnFailureListener() {
-                                @Override
-                                public void onFailure(@NonNull Exception e) {
-                                    Log.w(TAG, "Error deleting document", e);
-                                }
-                            });
-                    resetList();
-                }
-                else if(menuItem.getTitle().equals("Edit note")){
-                    gotoFrag(new Edit(titulo, user, nota, id));
-                }
-                return true;
+        popupMenu.setOnMenuItemClickListener(menuItem -> {
+            // Toast message on menu item clicked
+            if(menuItem.getTitle().equals("Delete note")){
+
+                db.collection("notes").document(id)
+                        .delete()
+                        .addOnSuccessListener(aVoid -> { TOASTY("The note has been deleted"); })
+                        .addOnFailureListener(e -> Log.w(TAG, "Error deleting document", e));
+
+
+                resetList();
             }
+            else if(menuItem.getTitle().equals("Edit note")) VMFrag.gotoFrag(new Edit(titulo, user, nota, id));
+            return true;
         });
         // Showing the popup menu
         popupMenu.show();
 
     }
-    private void resetList(){
-        List anotherFragment = new List(user);
-        FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
-        transaction.replace(R.id.framelayout, anotherFragment,null);
-        transaction.addToBackStack(null);
-        transaction.commit();
-    }
 
+
+
+    ///////////////////////////////////////////////////////////////////////////
+    //
+    private void resetList(){ VMFrag.gotoFrag(new List(user)); }
+
+
+
+
+    ///////////////////////////////////////////////////////////////////////////
+    //
+    // Função que cria um toast (referência a MK)
+    private void TOASTY(CharSequence err){
+        Context context = getActivity().getApplicationContext();
+        int dur = Toast.LENGTH_SHORT;
+        Toast inc = Toast.makeText(context, err, dur);
+        inc.show();
+    }
 }

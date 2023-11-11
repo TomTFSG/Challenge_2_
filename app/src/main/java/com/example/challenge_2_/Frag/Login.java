@@ -106,19 +106,6 @@ public class Login extends Fragment implements View.OnClickListener{
 
 
 
-
-    ///////////////////////////////////////////////////////////////////////////
-    //
-    // Função que cria um toast (referência a MK)
-    private void TOASTY(CharSequence err){
-        Context context = getActivity().getApplicationContext();
-        int dur = Toast.LENGTH_SHORT;
-        Toast inc = Toast.makeText(context, err, dur);
-        inc.show();
-    }
-
-
-
     ///////////////////////////////////////////////////////////////////////////
     //
     // definir variáveis utilizadas para checkar o Login e o Registo
@@ -262,5 +249,17 @@ public class Login extends Fragment implements View.OnClickListener{
             }
         }
         else Log.e(TAG, "Erro a conseguir os docs: ", task.getException()); //Se der erro isto aparece no log
+    }
+
+
+
+    ///////////////////////////////////////////////////////////////////////////
+    //
+    // Função que cria um toast (referência a MK)
+    private void TOASTY(CharSequence err){
+        Context context = getActivity().getApplicationContext();
+        int dur = Toast.LENGTH_SHORT;
+        Toast inc = Toast.makeText(context, err, dur);
+        inc.show();
     }
 }

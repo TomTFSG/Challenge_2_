@@ -44,9 +44,10 @@ public class MainActivity extends AppCompatActivity {
                     .addToBackStack(null)
                     .commit();
         });
+    }
 
-
-
+    public void Manel(){
+        Log.e("manel", "manel");
     }
 
 }
