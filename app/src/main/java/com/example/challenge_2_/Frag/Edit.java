@@ -18,6 +18,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.example.challenge_2_.R;
+import com.example.challenge_2_.ViewModels.VMFragments;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.DocumentReference;
@@ -28,11 +29,15 @@ import java.util.Map;
 
 
 public class Edit extends Fragment {
-    String title;
-    String note;
-    String user;
-    String id;
-    FirebaseFirestore db;
+    private String title;
+    private String note;
+    private String user;
+    private String id;
+    private FirebaseFirestore db;
+
+    private VMFragments VMFrag;
+
+
     public Edit(String title,String user,String note,String id) {
         db=FirebaseFirestore.getInstance();
         this.title=title;
