@@ -134,7 +134,7 @@ public class Edit extends Fragment {
             }
         });
         Button delete=view.findViewById(R.id.apagar);
-        back.setOnClickListener(new View.OnClickListener() {
+        delete.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View v) {
