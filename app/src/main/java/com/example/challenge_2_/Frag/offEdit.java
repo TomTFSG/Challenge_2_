@@ -63,7 +63,18 @@ public class offEdit extends Fragment {
             }
         }
         Button back=view.findViewById(R.id.back);
+        Button save=view.findViewById(R.id.save);
         back.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                offList anotherFragment = new offList();
+                FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
+                transaction.replace(R.id.framelayout, anotherFragment,null);
+                transaction.addToBackStack(null);
+                transaction.commit();
+            }
+        });
+        save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 String newTitle=titlebox.getText().toString();
@@ -98,11 +109,13 @@ public class offEdit extends Fragment {
                         values.put(FeedReaderDbHelper.COLUMN_NAME_TITLE, newTitle);
                         values.put(FeedReaderDbHelper.COLUMN_NAME_NOTE, newNote);
                         long newRowId = sql.insert(FeedReaderDbHelper.TABLE_NAME, null, values);
-                        offList anotherFragment = new offList();
-                        FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
-                        transaction.replace(R.id.framelayout, anotherFragment,null);
-                        transaction.addToBackStack(null);
-                        transaction.commit();
+
+                        Context context = getActivity().getApplicationContext();
+                        CharSequence err = "Saved";
+                        int dur = Toast.LENGTH_SHORT;
+                        Toast inc = Toast.makeText(context, err, dur);
+                        inc.show();
+
                     } else {
                         Context context = getActivity().getApplicationContext();
                         CharSequence err = "There is a note with this title already";
@@ -148,11 +161,11 @@ public class offEdit extends Fragment {
                         values.put(FeedReaderDbHelper.COLUMN_NAME_NOTE, newNote);
                         long newRowId = sql.insert(FeedReaderDbHelper.TABLE_NAME, null, values);
 
-                        offList anotherFragment = new offList();
-                        FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
-                        transaction.replace(R.id.framelayout, anotherFragment,null);
-                        transaction.addToBackStack(null);
-                        transaction.commit();
+                        Context context = getActivity().getApplicationContext();
+                        CharSequence err = "Saved";
+                        int dur = Toast.LENGTH_SHORT;
+                        Toast inc = Toast.makeText(context, err, dur);
+                        inc.show();
                     } else {
                         String sel = FeedReaderDbHelper.COLUMN_NAME_TITLE + " LIKE ?";
                         String[] selArgs = { title };
@@ -163,11 +176,11 @@ public class offEdit extends Fragment {
                         val.put(FeedReaderDbHelper.COLUMN_NAME_NOTE, newNote);
                         long newRowId = sql.insert(FeedReaderDbHelper.TABLE_NAME, null, val);
 
-                        offList anotherFragment = new offList();
-                        FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
-                        transaction.replace(R.id.framelayout, anotherFragment,null);
-                        transaction.addToBackStack(null);
-                        transaction.commit();
+                        Context context = getActivity().getApplicationContext();
+                        CharSequence err = "Saved";
+                        int dur = Toast.LENGTH_SHORT;
+                        Toast inc = Toast.makeText(context, err, dur);
+                        inc.show();
                     }
                     cursor.close();
 
@@ -177,7 +190,7 @@ public class offEdit extends Fragment {
             }
         });
         Button delete=view.findViewById(R.id.apagar);
-        back.setOnClickListener(new View.OnClickListener() {
+        delete.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View v) {
@@ -198,7 +211,6 @@ public class offEdit extends Fragment {
                     int dur = Toast.LENGTH_SHORT;
                     Toast inc = Toast.makeText(context, err, dur);
                     inc.show();
-
                     offList anotherFragment = new offList();
                     FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
                     transaction.replace(R.id.framelayout, anotherFragment,null);

@@ -4,15 +4,19 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Frag.Edit"
     android:background="#CEEFF1"
-    android:padding="20dp">
+    tools:context=".Frag.Edit">
+
+    <include
+        layout="@layout/appbar"
+        tools:layout_editor_absoluteX="-88dp"
+        tools:layout_editor_absoluteY="16dp" />
 
     <Button
         android:id="@+id/back"
         style="@android:style/Widget.Material.Light.Button.Borderless.Small"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="68dp"
+        android:layout_height="56dp"
         android:drawableLeft="@drawable/back"
         android:shadowColor="#00FFFFFF"
         android:text=""
@@ -59,5 +63,14 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/title_box" />
+
+    <Button
+        android:id="@+id/save"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="13dp"
+        android:text="SAVE"
+        app:layout_constraintEnd_toStartOf="@+id/apagar"
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

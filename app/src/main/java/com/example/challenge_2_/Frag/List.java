@@ -2,6 +2,7 @@ package com.example.challenge_2_.Frag;
 
 import static android.content.ContentValues.TAG;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Bundle;
 
@@ -112,6 +113,7 @@ public class List extends Fragment {
                                     private Runnable runnable;
                                     private long pressStartTime;
                                     private static final long MAX_CLICK_DURATION = 200;
+                                    @SuppressLint("ClickableViewAccessibility")
                                     @Override
                                     public boolean onTouch(View v, MotionEvent event) {
 
