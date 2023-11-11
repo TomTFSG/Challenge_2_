@@ -10,19 +10,10 @@
 
     <include
         android:id="@+id/include"
-        layout="@layout/appbar" />
-
-    <Button
-        android:id="@+id/logout"
-        style="@android:style/Widget.Material.Light.Button.Borderless"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Logout"
-        android:textColor="#FAFAFA"
-        android:textColorHint="#FFFFFF"
-        android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
+        layout="@layout/appbar"
         app:layout_constraintTop_toTopOf="parent" />
+
+
 
     <TextView
         android:id="@+id/notes_title"
@@ -42,13 +33,14 @@
 
     <ScrollView
         android:id="@+id/scrollview"
-        android:padding="40dp"
         android:layout_width="414dp"
         android:layout_height="550dp"
+        android:layout_marginTop="15dp"
+        android:padding="40dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/logout"
+        app:layout_constraintTop_toBottomOf="@+id/notes_title"
         app:layout_constraintVertical_bias="1.0">
 
         <LinearLayout
@@ -58,34 +50,8 @@
             android:orientation="vertical" />
     </ScrollView>
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/add"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:clickable="true"
-        android:src="@drawable/add"
-        app:backgroundTint="#00FFFFFF"
-        app:elevation="0dp"
-        app:fabCustomSize="100dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:maxImageSize="100dp"
-        app:rippleColor="#00FFFFFF" />
 
-    <EditText
-        android:id="@+id/searchbar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:ems="10"
-        android:inputType="text"
-        android:text=""
-        android:textColor="@color/white"
-        app:layout_constraintBottom_toBottomOf="@+id/include"
-        app:layout_constraintEnd_toStartOf="@+id/logout"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0" />
+
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
