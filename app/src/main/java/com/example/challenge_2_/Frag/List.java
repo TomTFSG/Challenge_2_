@@ -7,17 +7,25 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 
+import android.os.Handler;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.PopupMenu;
+import android.widget.Toast;
 
 import com.example.challenge_2_.R;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -100,6 +108,30 @@ public class List extends Fragment {
                                 select.setTextAlignment(view.TEXT_ALIGNMENT_TEXT_START);
 
                                 select.setOnClickListener(view3 -> gotoFrag(new Edit(titulo, user, nota, id)));
+                                select.setOnTouchListener(new View.OnTouchListener(){
+                                    private Handler handler = new Handler();
+                                    private Runnable runnable;
+                                    @Override
+                                    public boolean onTouch(View v, MotionEvent event) {
+                                        switch (event.getAction()) {
+                                            case MotionEvent.ACTION_DOWN:
+                                                // Start the handler after a delay (e.g., 500 milliseconds)
+                                                handler.postDelayed(runnable = () -> {
+                                                    // Handle the long press action
+                                                    onButtonLongPress(select,titulo, user, nota,id);
+                                                }, 500);
+                                                break;
+
+                                            case MotionEvent.ACTION_UP:
+                                            case MotionEvent.ACTION_CANCEL:
+                                                // Cancel the handler if the button is released
+                                                handler.removeCallbacks(runnable);
+                                                break;
+                                        }
+                                        return true; // Consume the touch event
+                                    }
+
+                                });
                                 menu.addView(select);
                                 menu.invalidate();
 
@@ -171,4 +203,90 @@ public class List extends Fragment {
                 });
 
     }
+    private void onButtonLongPress(Button button,String titulo,String user,String nota,String id){
+        View view=getView();
+        PopupMenu popupMenu = new PopupMenu(getContext(), button);
+
+        // Inflating popup menu from popup_menu.xml file
+        popupMenu.getMenuInflater().inflate(R.menu.popup_menu, popupMenu.getMenu());
+        popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem menuItem) {
+                // Toast message on menu item clicked
+                if(menuItem.getTitle().equals("Delete note")){
+                    db.collection("notes").document(id)
+                            .delete()
+                            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void aVoid) {
+                                    Log.d(TAG, "DocumentSnapshot successfully deleted!");
+                                    Context context = getActivity().getApplicationContext();
+                                    CharSequence err = "The note has been deleted";
+                                    int dur = Toast.LENGTH_SHORT;
+                                    Toast inc = Toast.makeText(context, err, dur);
+                                    inc.show();
+                                    List anotherFragment = new List(user);
+                                    FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
+                                    transaction.replace(R.id.framelayout, anotherFragment,null);
+                                    transaction.addToBackStack(null);
+                                    transaction.commit();
+                                }
+                            })
+                            .addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    Log.w(TAG, "Error deleting document", e);
+                                }
+                            });
+                    resetList();
+                }
+                else if(menuItem.getTitle().equals("Edit note")){
+                    gotoFrag(new Edit(titulo, user, nota, id));
+                }
+                return true;
+            }
+        });
+        // Showing the popup menu
+        popupMenu.show();
+
+    }
+    private void resetList(){
+        View view=getView();
+        LinearLayout menu = view.findViewById(R.id.menu);
+        db = FirebaseFirestore.getInstance();
+        db.collection("notes")
+                .whereEqualTo("users_username", user)
+                .get()
+                .addOnCompleteListener(task -> {
+                    Context context = getContext();
+                    if (task.isSuccessful()) {
+                        for (QueryDocumentSnapshot document : task.getResult()) {
+                            // DADO ESTE MODELO, NENHUM UTILIZADOR PODE TER DUAS NOTAS COM O MESMO NOME
+                            String titulo = document.getString("title");
+                            String nota = document.getString("note");
+                            String id = document.getId().toString();
+                            Button select = new Button(context);
+
+                            ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(
+                                    ViewGroup.LayoutParams.MATCH_PARENT, // Width
+                                    ViewGroup.LayoutParams.WRAP_CONTENT   // Height (you can adjust this as needed)
+                            );
+
+                            select.setLayoutParams(layoutParams);
+                            select.setText(titulo);
+                            select.setTextAlignment(view.TEXT_ALIGNMENT_TEXT_START);
+
+                            select.setOnClickListener(view3 -> gotoFrag(new Edit(titulo, user, nota, id)));
+                            menu.addView(select);
+                            menu.invalidate();
+
+
+                        }
+
+                    } else {
+                        Log.d(TAG, "Error getting documents: ", task.getException());
+                    }
+                });
+    }
+
 }
