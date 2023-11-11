@@ -6,8 +6,9 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".Frag.List"
-    android:background="#080808"
-    android:padding="20dp">
+    android:background="#080808">
+
+    <include layout="@layout/appbar" />
 
     <Button
         android:id="@+id/logout"

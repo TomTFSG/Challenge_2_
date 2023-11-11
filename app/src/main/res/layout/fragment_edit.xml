@@ -6,7 +6,9 @@
     android:layout_height="match_parent"
     tools:context=".Frag.Edit"
     android:background="#CEEFF1"
-    android:padding="20dp">
+    >
+
+    <include layout="@layout/appbar" />
 
     <Button
         android:id="@+id/back"

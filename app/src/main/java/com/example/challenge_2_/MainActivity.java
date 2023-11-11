@@ -18,7 +18,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 
 public class MainActivity extends AppCompatActivity {
-    boolean isConnected=false;
+    boolean isConnected = false;
 
 
     @Override
