@@ -57,10 +57,21 @@ public class Edit extends Fragment {
             }
         }
         Button back=view.findViewById(R.id.back);
+        Button save=view.findViewById(R.id.save);
         back.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View view) {
+                List anotherFragment = new List(user);
+                FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
+                transaction.replace(R.id.framelayout, anotherFragment,null);
+                transaction.addToBackStack(null);
+                transaction.commit();
+            }
+        });
+        save.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
                 String newTitle=titlebox.getText().toString();
                 String newNote=notebox.getText().toString();
                 if(id.isEmpty()){
@@ -103,6 +114,7 @@ public class Edit extends Fragment {
                     docRef.update("note", newNote).addOnSuccessListener(new OnSuccessListener<Void>() {
                                 @Override
                                 public void onSuccess(Void aVoid) {
+
                                     Log.w(TAG, "DocumentSnapshot successfully updated!");
                                     Log.d(TAG,newNote);
                                 }
@@ -114,11 +126,11 @@ public class Edit extends Fragment {
                                 }
                             });
                 }
-                List anotherFragment = new List(user);
-                FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
-                transaction.replace(R.id.framelayout, anotherFragment,null);
-                transaction.addToBackStack(null);
-                transaction.commit();
+                Context context = getActivity().getApplicationContext();
+                CharSequence err = "Saved";
+                int dur = Toast.LENGTH_SHORT;
+                Toast inc = Toast.makeText(context, err, dur);
+                inc.show();
             }
         });
         Button delete=view.findViewById(R.id.apagar);
